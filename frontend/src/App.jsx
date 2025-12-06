@@ -49,7 +49,7 @@ function App() {
       });
 
       if (!response.ok) {
-        throw new Error('Analysis failed');
+        throw new Error('Analiza nie powiodła się');
       }
 
       const data = await response.json();
@@ -73,10 +73,10 @@ function App() {
         </div>
 
         <nav className="flex-1 px-4 space-y-2 mt-4">
-          <NavItem icon={<LayoutDashboard />} label="Dashboard" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
-          <NavItem icon={<Activity />} label="Analysis" active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
-          <NavItem icon={<FileText />} label="Reports" active={activeTab === 'reports'} onClick={() => setActiveTab('reports')} />
-          <NavItem icon={<Settings />} label="Settings" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
+          <NavItem icon={<LayoutDashboard />} label="Panel" active={activeTab === 'dashboard'} onClick={() => setActiveTab('dashboard')} />
+          <NavItem icon={<Activity />} label="Analiza" active={activeTab === 'analysis'} onClick={() => setActiveTab('analysis')} />
+          <NavItem icon={<FileText />} label="Raporty" active={activeTab === 'reports'} onClick={() => setActiveTab('reports')} />
+          <NavItem icon={<Settings />} label="Ustawienia" active={activeTab === 'settings'} onClick={() => setActiveTab('settings')} />
         </nav>
 
         <div className="p-4 border-t border-border">
@@ -84,7 +84,7 @@ function App() {
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-accent to-emerald-300"></div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">Operator</p>
-              <p className="text-xs text-secondary truncate">Line A Manager</p>
+              <p className="text-xs text-secondary truncate">Kierownik Linii A</p>
             </div>
           </div>
         </div>
@@ -94,15 +94,15 @@ function App() {
       <main className="flex-1 overflow-auto">
         <header className="h-16 border-b border-border flex items-center justify-between px-8 bg-background/80 backdrop-blur-sm sticky top-0 z-10">
           <h1 className="text-xl font-semibold">
-            {activeTab === 'dashboard' && 'Production Overview'}
-            {activeTab === 'analysis' && 'Belt Analysis'}
-            {activeTab === 'reports' && 'Generated Reports'}
-            {activeTab === 'settings' && 'System Configuration'}
+            {activeTab === 'dashboard' && 'Przegląd Produkcji'}
+            {activeTab === 'analysis' && 'Analiza Taśmy'}
+            {activeTab === 'reports' && 'Wygenerowane Raporty'}
+            {activeTab === 'settings' && 'Konfiguracja Systemu'}
           </h1>
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-2 text-sm text-secondary">
               <div className="w-2 h-2 rounded-full bg-accent animate-pulse"></div>
-              System Operational
+              System Operacyjny
             </span>
           </div>
         </header>
@@ -118,6 +118,7 @@ function App() {
             />
           )}
           {activeTab === 'reports' && <ReportsView />}
+          {activeTab === 'settings' && <SettingsView />}
         </div>
       </main>
     </div>
@@ -144,17 +145,17 @@ function DashboardView() {
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="Avg. Belt Width" value="498.2 mm" trend="+0.4%" status="good" />
-        <StatCard title="Seam Detections" value="1,240" trend="+12%" status="neutral" />
-        <StatCard title="Anomalies" value="3" trend="-2" status="good" />
+        <StatCard title="Śr. Szerokość Taśmy" value="498.2 mm" trend="+0.4%" status="good" />
+        <StatCard title="Wykryte Szwy" value="1,240" trend="+12%" status="neutral" />
+        <StatCard title="Anomalie" value="3" trend="-2" status="good" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 bg-surface border border-border rounded-xl p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-lg">Production Schedule</h3>
-              <p className="text-sm text-secondary">Week 42 • Oct 14 - Oct 20</p>
+              <h3 className="font-semibold text-lg">Harmonogram Produkcji</h3>
+              <p className="text-sm text-secondary">Tydzień 42 • 14 Paź - 20 Paź</p>
             </div>
             <div className="flex gap-1">
               <div className="w-2 h-2 rounded-full bg-accent"></div>
@@ -166,32 +167,32 @@ function DashboardView() {
           {/* Timeline Mock */}
           <div className="space-y-4">
             <div className="flex text-xs text-secondary border-b border-border pb-2">
-              <div className="w-24">Resource</div>
+              <div className="w-24">Zasób</div>
               <div className="flex-1 grid grid-cols-6 gap-2 text-center">
                 <span>08:00</span><span>10:00</span><span>12:00</span><span>14:00</span><span>16:00</span><span>18:00</span>
               </div>
             </div>
             
             <TimelineRow 
-              resource="Line A" 
-              sub="Cap: 100%" 
+              resource="Linia A" 
+              sub="Wyd: 100%" 
               items={[
-                { name: "Order #4421", status: "Running", start: 1, span: 3, color: "bg-surface border border-border" }
+                { name: "Zlecenie #4421", status: "W toku", start: 1, span: 3, color: "bg-surface border border-border" }
               ]} 
             />
             <TimelineRow 
-              resource="Assembly 1" 
-              sub="Cap: 85%" 
+              resource="Montaż 1" 
+              sub="Wyd: 85%" 
               items={[
-                { name: "Order #4425", status: "Delayed 15m", start: 3, span: 2, color: "bg-surface border border-border text-yellow-500" },
-                { name: "Maintenance", status: "", start: 5, span: 1, color: "bg-surface/50 border border-border/50 text-secondary" }
+                { name: "Zlecenie #4425", status: "Opóźnienie 15m", start: 3, span: 2, color: "bg-surface border border-border text-yellow-500" },
+                { name: "Konserwacja", status: "", start: 5, span: 1, color: "bg-surface/50 border border-border/50 text-secondary" }
               ]} 
             />
              <TimelineRow 
-              resource="Packaging" 
-              sub="Cap: 40%" 
+              resource="Pakowanie" 
+              sub="Wyd: 40%" 
               items={[
-                { name: "Order #4419", status: "On Track", start: 2, span: 2, color: "bg-surface border border-border" }
+                { name: "Zlecenie #4419", status: "Zgodnie z planem", start: 2, span: 2, color: "bg-surface border border-border" }
               ]} 
             />
           </div>
@@ -200,16 +201,16 @@ function DashboardView() {
             <div className="w-6 h-6 rounded-full bg-purple-500/20 flex items-center justify-center">
               <div className="w-2 h-2 rounded-full bg-purple-500"></div>
             </div>
-            <p className="text-sm"><span className="font-semibold text-purple-400">AI Insight:</span> Moving Order #4425 to Line B would save 45 mins.</p>
+            <p className="text-sm"><span className="font-semibold text-purple-400">Wskazówka AI:</span> Przeniesienie Zlecenia #4425 na Linię B zaoszczędziłoby 45 min.</p>
           </div>
         </div>
 
         <div className="bg-surface border border-border rounded-xl p-6">
-          <h3 className="font-semibold text-lg mb-4">Recent Alerts</h3>
+          <h3 className="font-semibold text-lg mb-4">Ostatnie Alerty</h3>
           <div className="space-y-4">
-            <AlertItem title="Width Deviation" time="10:42 AM" type="warning" />
-            <AlertItem title="Seam Detected" time="10:30 AM" type="info" />
-            <AlertItem title="System Startup" time="08:00 AM" type="success" />
+            <AlertItem title="Odchylenie Szerokości" time="10:42" type="warning" />
+            <AlertItem title="Wykryto Szew" time="10:30" type="info" />
+            <AlertItem title="Start Systemu" time="08:00" type="success" />
           </div>
         </div>
       </div>
@@ -222,7 +223,7 @@ function AnalysisView({ isUploading, onUpload, result, error }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[calc(100vh-12rem)]">
       <div className="lg:col-span-1 space-y-6">
         <div className="bg-surface border border-border rounded-xl p-6">
-          <h3 className="font-semibold text-lg mb-4">New Analysis</h3>
+          <h3 className="font-semibold text-lg mb-4">Nowa Analiza</h3>
           <div className="border-2 border-dashed border-border rounded-lg p-8 text-center hover:border-accent/50 transition-colors relative">
             <input 
               type="file" 
@@ -236,7 +237,7 @@ function AnalysisView({ isUploading, onUpload, result, error }) {
                 {isUploading ? <Activity className="animate-spin text-accent" /> : <Upload className="text-secondary" />}
               </div>
               <div>
-                <p className="font-medium">Click to upload or drag and drop</p>
+                <p className="font-medium">Kliknij by wgrać lub przeciągnij plik</p>
                 <p className="text-sm text-secondary">MP4, AVI, JPG, PNG</p>
               </div>
             </div>
@@ -251,22 +252,22 @@ function AnalysisView({ isUploading, onUpload, result, error }) {
 
         {result && (
           <div className="bg-surface border border-border rounded-xl p-6 space-y-4">
-            <h3 className="font-semibold text-lg">Results Summary</h3>
+            <h3 className="font-semibold text-lg">Podsumowanie Wyników</h3>
             <div className="space-y-3">
-              <ResultRow label="File" value={result.source_file} />
-              <ResultRow label="Duration" value={`${result.total_frames} frames`} />
-              <ResultRow label="Segments" value={result.total_segments} />
+              <ResultRow label="Plik" value={result.source_file} />
+              <ResultRow label="Czas trwania" value={`${result.total_frames} klatek`} />
+              <ResultRow label="Segmenty" value={result.total_segments} />
               <ResultRow label="FPS" value={result.fps} />
             </div>
             <button className="w-full py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors">
-              Download Full Report
+              Pobierz Pełny Raport
             </button>
           </div>
         )}
       </div>
 
       <div className="lg:col-span-2 bg-surface border border-border rounded-xl p-6 flex flex-col">
-        <h3 className="font-semibold text-lg mb-6">Width Analysis Visualization</h3>
+        <h3 className="font-semibold text-lg mb-6">Wizualizacja Szerokości</h3>
         {result ? (
           <div className="flex-1 min-h-[300px]">
              <ResponsiveContainer width="100%" height="100%">
@@ -284,7 +285,7 @@ function AnalysisView({ isUploading, onUpload, result, error }) {
           </div>
         ) : (
           <div className="flex-1 flex items-center justify-center text-secondary border border-dashed border-border rounded-lg bg-background/50">
-            <p>Upload a file to visualize data</p>
+            <p>Wgraj plik aby zobaczyć dane</p>
           </div>
         )}
       </div>
@@ -327,33 +328,33 @@ function ReportsView() {
   return (
     <div className="bg-surface border border-border rounded-xl p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="font-semibold text-lg">Available Reports</h3>
+        <h3 className="font-semibold text-lg">Dostępne Raporty</h3>
         <button onClick={fetchReports} className="text-sm text-secondary hover:text-primary">
-          Refresh List
+          Odśwież Listę
         </button>
       </div>
       
       {reports.length === 0 ? (
         <div className="text-secondary text-center py-12 border border-dashed border-border rounded-lg">
-          No reports generated yet. Run an analysis to see results here.
+          Brak wygenerowanych raportów. Uruchom analizę, aby zobaczyć wyniki.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead>
               <tr className="border-b border-border text-secondary">
-                <th className="pb-3 font-medium">Date</th>
-                <th className="pb-3 font-medium">Source File</th>
-                <th className="pb-3 font-medium">Segments</th>
+                <th className="pb-3 font-medium">Data</th>
+                <th className="pb-3 font-medium">Plik Źródłowy</th>
+                <th className="pb-3 font-medium">Segmenty</th>
                 <th className="pb-3 font-medium">FPS</th>
-                <th className="pb-3 font-medium text-right">Actions</th>
+                <th className="pb-3 font-medium text-right">Akcje</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
               {reports.map((report) => (
                 <tr key={report.analysis_id} className="group hover:bg-white/5 transition-colors">
                   <td className="py-4 text-secondary">
-                    {new Date(report.created_at).toLocaleString()}
+                    {new Date(report.created_at).toLocaleString('pl-PL')}
                   </td>
                   <td className="py-4 font-medium">{report.source_file}</td>
                   <td className="py-4">{report.total_segments}</td>
@@ -363,21 +364,21 @@ function ReportsView() {
                       <button 
                         onClick={() => downloadReport(report.analysis_id, 'excel')}
                         className="p-2 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors"
-                        title="Download Excel"
+                        title="Pobierz Excel"
                       >
                         <FileSpreadsheet size={18} />
                       </button>
                       <button 
                         onClick={() => downloadReport(report.analysis_id, 'csv')}
                         className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"
-                        title="Download CSV"
+                        title="Pobierz CSV"
                       >
                         <FileText size={18} />
                       </button>
                       <button 
                         onClick={() => downloadReport(report.analysis_id, 'json')}
                         className="p-2 hover:bg-white/10 rounded-lg text-yellow-400 transition-colors"
-                        title="Download JSON"
+                        title="Pobierz JSON"
                       >
                         <FileJson size={18} />
                       </button>
@@ -389,6 +390,68 @@ function ReportsView() {
           </table>
         </div>
       )}
+    </div>
+  );
+}
+
+function SettingsView() {
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="bg-surface border border-border rounded-xl p-6 space-y-6">
+        <h3 className="font-semibold text-lg border-b border-border pb-4">Konfiguracja Analizy</h3>
+        
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-secondary">Domyślna Min. Szerokość (px)</label>
+            <input type="number" defaultValue="100" className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-secondary">Domyślna Max. Szerokość (px)</label>
+            <input type="number" defaultValue="2000" className="w-full bg-background border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-accent" />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-secondary">Czułość Detekcji Szwów (0.1 - 1.0)</label>
+            <div className="flex items-center gap-4">
+              <input type="range" min="0.1" max="1.0" step="0.1" defaultValue="0.3" className="flex-1 accent-accent" />
+              <span className="text-sm font-mono w-8">0.3</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-surface border border-border rounded-xl p-6 space-y-6">
+        <h3 className="font-semibold text-lg border-b border-border pb-4">Ustawienia Systemowe</h3>
+        
+        <div className="space-y-4">
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="font-medium text-sm">Automatyczne Raporty</p>
+              <p className="text-xs text-secondary">Generuj PDF po każdej analizie</p>
+            </div>
+            <div className="w-10 h-6 bg-accent rounded-full relative cursor-pointer">
+              <div className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div>
+              <p className="font-medium text-sm">Powiadomienia Email</p>
+              <p className="text-xs text-secondary">Wysyłaj alerty o anomaliach</p>
+            </div>
+            <div className="w-10 h-6 bg-border rounded-full relative cursor-pointer">
+              <div className="absolute left-1 top-1 w-4 h-4 bg-secondary rounded-full"></div>
+            </div>
+          </div>
+
+          <div className="pt-4 border-t border-border">
+            <button className="w-full py-2 bg-white text-black font-medium rounded-lg hover:bg-gray-200 transition-colors">
+              Zapisz Ustawienia
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
