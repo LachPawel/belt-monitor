@@ -185,10 +185,7 @@ Open Source - MIT License
 
 ## 👥 Zespół
 
-Projekt stworzony na hackathon JSW IT Systems.
+- Paweł Lach
+- Bartosz Idzik
 
-## 📞 Kontakt
-
-- Robert Zając: 605 092 402
-- Jacek Garus: 605 747 595
-- Konrad Wesenfeld: 605 091 074
+Projekt stworzony na hackathon HackNation 2025
