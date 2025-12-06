@@ -33,6 +33,17 @@ services:
     profiles:
       - ui
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: belt-monitor-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - belt-monitor
+    restart: unless-stopped
+
 volumes:
   data:
   reports:
