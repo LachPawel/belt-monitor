@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 from dataclasses import dataclass, field
 from typing import List, Tuple, Optional
+from datetime import datetime
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -48,6 +49,7 @@ class AnalysisResult:
     fps: float
     segments: List[SegmentMeasurement]
     alerts: List[dict] = field(default_factory=list)
+    created_at: str = field(default_factory=lambda: datetime.now().isoformat())
     
     def to_dict(self) -> dict:
         return {

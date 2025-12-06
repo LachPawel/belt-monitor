@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   Activity, 
@@ -9,7 +9,10 @@ import {
   CheckCircle2,
   Clock,
   MoreHorizontal,
-  Play
+  Play,
+  Download,
+  FileSpreadsheet,
+  FileJson
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -290,12 +293,102 @@ function AnalysisView({ isUploading, onUpload, result, error }) {
 }
 
 function ReportsView() {
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchReports();
+  }, []);
+
+  const fetchReports = async () => {
+    try {
+      const response = await fetch(`${API_URL}/results`);
+      const data = await response.json();
+      setReports(data.analyses || []);
+    } catch (error) {
+      console.error('Failed to fetch reports:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const downloadReport = (id, format) => {
+    window.open(`${API_URL}/reports/${id}/${format}`, '_blank');
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-surface border border-border rounded-xl p-6 flex items-center justify-center h-64">
+        <Activity className="animate-spin text-accent" />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-surface border border-border rounded-xl p-6">
-      <h3 className="font-semibold text-lg mb-6">Available Reports</h3>
-      <div className="text-secondary text-center py-12">
-        No reports generated yet.
+      <div className="flex items-center justify-between mb-6">
+        <h3 className="font-semibold text-lg">Available Reports</h3>
+        <button onClick={fetchReports} className="text-sm text-secondary hover:text-primary">
+          Refresh List
+        </button>
       </div>
+      
+      {reports.length === 0 ? (
+        <div className="text-secondary text-center py-12 border border-dashed border-border rounded-lg">
+          No reports generated yet. Run an analysis to see results here.
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm">
+            <thead>
+              <tr className="border-b border-border text-secondary">
+                <th className="pb-3 font-medium">Date</th>
+                <th className="pb-3 font-medium">Source File</th>
+                <th className="pb-3 font-medium">Segments</th>
+                <th className="pb-3 font-medium">FPS</th>
+                <th className="pb-3 font-medium text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/50">
+              {reports.map((report) => (
+                <tr key={report.analysis_id} className="group hover:bg-white/5 transition-colors">
+                  <td className="py-4 text-secondary">
+                    {new Date(report.created_at).toLocaleString()}
+                  </td>
+                  <td className="py-4 font-medium">{report.source_file}</td>
+                  <td className="py-4">{report.total_segments}</td>
+                  <td className="py-4">{report.fps.toFixed(1)}</td>
+                  <td className="py-4 text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <button 
+                        onClick={() => downloadReport(report.analysis_id, 'excel')}
+                        className="p-2 hover:bg-white/10 rounded-lg text-emerald-400 transition-colors"
+                        title="Download Excel"
+                      >
+                        <FileSpreadsheet size={18} />
+                      </button>
+                      <button 
+                        onClick={() => downloadReport(report.analysis_id, 'csv')}
+                        className="p-2 hover:bg-white/10 rounded-lg text-blue-400 transition-colors"
+                        title="Download CSV"
+                      >
+                        <FileText size={18} />
+                      </button>
+                      <button 
+                        onClick={() => downloadReport(report.analysis_id, 'json')}
+                        className="p-2 hover:bg-white/10 rounded-lg text-yellow-400 transition-colors"
+                        title="Download JSON"
+                      >
+                        <FileJson size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }

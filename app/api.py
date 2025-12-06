@@ -268,10 +268,20 @@ async def get_result(analysis_id: str):
 
 @app.get("/api/v1/results")
 async def list_results():
-    """List all analysis results"""
+    """List all analysis results with metadata"""
+    results_list = []
+    for aid, result in analysis_results.items():
+        results_list.append({
+            "analysis_id": aid,
+            "source_file": getattr(result, "source_file", "unknown"),
+            "created_at": getattr(result, "created_at", datetime.now().isoformat()), # Fallback if not stored
+            "total_segments": len(result.segments),
+            "fps": result.fps
+        })
+    
     return {
-        "count": len(analysis_results),
-        "analyses": list(analysis_results.keys())
+        "count": len(results_list),
+        "analyses": sorted(results_list, key=lambda x: x["created_at"], reverse=True)
     }
 
 
