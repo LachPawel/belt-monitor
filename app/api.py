@@ -13,6 +13,7 @@ import logging
 from fastapi import FastAPI, File, UploadFile, HTTPException, Query, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app.belt_analyzer import BeltAnalyzer, AnalysisResult
@@ -45,8 +46,17 @@ REPORTS_DIR = Path("reports")
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+# Mount static files for frontend
+STATIC_DIR = Path("static")
+if STATIC_DIR.exists():
+    app.mount("/", StaticFiles(directory="static", html=True), name="static")
+    logger.info(f"Mounted static files from {STATIC_DIR}")
+else:
+    logger.warning(f"Static directory not found at {STATIC_DIR}")
+
 # In-memory storage for results (in production, use a database)
 analysis_results = {}
+
 
 
 # Pydantic models
