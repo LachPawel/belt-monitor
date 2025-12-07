@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     curl \
     nginx \
+    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements first for caching
@@ -41,14 +42,12 @@ COPY . .
 COPY --from=frontend-builder /frontend/dist ./frontend/dist
 
 # Create directories
-RUN mkdir -p data/uploads reports
+RUN mkdir -p data/uploads reports /var/log/supervisor
 
 # Configure nginx to serve frontend and proxy API
-RUN mkdir -p /etc/nginx/conf.d
-
-RUN cat > /etc/nginx/conf.d/default.conf << 'EOF'
+RUN cat > /etc/nginx/sites-enabled/default << 'EOF'
 server {
-    listen 8080;
+    listen 8080 default_server;
     server_name _;
     client_max_body_size 100M;
 
@@ -62,7 +61,7 @@ server {
 
     # Proxy API requests to backend
     location /api/ {
-        proxy_pass http://localhost:8000;
+        proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
@@ -71,31 +70,60 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_buffering off;
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
     }
 
     # Also proxy /docs and /openapi.json for API docs
     location /docs {
-        proxy_pass http://localhost:8000;
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
     }
 
     location /openapi.json {
-        proxy_pass http://localhost:8000;
+        proxy_pass http://127.0.0.1:8000;
         proxy_set_header Host $host;
     }
 
     location /health {
-        proxy_pass http://localhost:8000;
+        proxy_pass http://127.0.0.1:8000;
     }
 }
+EOF
+
+# Configure supervisor to manage both processes
+RUN cat > /etc/supervisor/conf.d/supervisord.conf << 'EOF'
+[supervisord]
+nodaemon=true
+logfile=/var/log/supervisor/supervisord.log
+pidfile=/var/run/supervisord.pid
+
+[program:nginx]
+command=/usr/sbin/nginx -g "daemon off;"
+autostart=true
+autorestart=true
+startsecs=5
+stopasgroup=true
+stdout_logfile=/var/log/supervisor/nginx.log
+stderr_logfile=/var/log/supervisor/nginx_err.log
+
+[program:api]
+command=uvicorn app.api:app --host 127.0.0.1 --port 8000
+directory=/app
+autostart=true
+autorestart=true
+startsecs=10
+stdout_logfile=/var/log/supervisor/api.log
+stderr_logfile=/var/log/supervisor/api_err.log
 EOF
 
 # Expose port
 EXPOSE 8080
 
 # Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
     CMD curl -f http://localhost:8080/health || exit 1
 
-# Start both services
-CMD ["sh", "-c", "nginx -g 'daemon off;' & uvicorn app.api:app --host 127.0.0.1 --port 8000"]
+# Run supervisord to manage both services
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
